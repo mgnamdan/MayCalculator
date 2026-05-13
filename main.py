@@ -2,25 +2,26 @@
 # HELPER FUNCTIONS AND IMPORTS
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 def add(numOne, numTwo):
-    return numOne + numTwo
+    return str(float(numOne) + float(numTwo))
 
 
 
 def subtract(numOne, numTwo):
-    return numOne - numTwo
+    return str(float(numOne) - float(numTwo))
 
 
 
 def multiply(numOne, numTwo):
-    return numOne * numTwo
+    return str(float(numOne) * float(numTwo))
 
 
 
 def divide(numOne, numTwo):
     try:
-        return numOne / numTwo
+        return str(float(numOne) / float(numTwo))
     except ZeroDivisionError:
-        return 0
+        print("An error occurred - unable to divide by zero in the equation")
+        return "Error"
 
 
 
@@ -45,26 +46,29 @@ def tokenize(equation):
 
 
 def evaluate(tokens, operator):
-    operations = {"+": add,
-                  "-": subtract,
-                  "*": multiply,
-                  "/": divide}
-    
-    newChunks = []
-    for idx in range(len(tokens)):
-        if tokens[idx] == operator:
-            numOne = float(tokens[idx-1])
-            numTwo = float(tokens[idx+1])
-            result = operations[operator](numOne, numTwo)
-            newChunks.append(result)
-        elif tokens[idx] != operator and tokens[idx] in ["+", "-", "*", "/"]:
-            newChunks.append(tokens[idx-1])
-            newChunks.append(tokens[idx])
-            newChunks.append(tokens[idx+1])
-        else:
-            continue
+    operations = {
+        "+": add,
+        "-": subtract,
+        "*": multiply,
+        "/": divide,
+    }
 
-    return newChunks
+    newTokens = [tokens[0]]
+
+    for idx in range(1, len(tokens), 2):
+
+        op = tokens[idx]
+        right = tokens[idx + 1]
+
+        if op == operator:
+            left = newTokens.pop()
+            result = operations[operator](left, right)
+            newTokens.append(result)
+        else:
+            newTokens.append(op)
+            newTokens.append(right)
+
+    return newTokens
 
 
 
@@ -74,47 +78,38 @@ def evaluate(tokens, operator):
 def main():
     calcOn = True
 
-    
-
     while calcOn:
+
         print("")
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("")
+        print("Enter an equation")
+        print("")
+        equation = input(" --> ")
+
+        tokens = tokenize(equation)
+        for operator in ['*', '/', '+', '-']:
+            tokens = evaluate(tokens, operator)
+
+        print("")
+        print(f" --> {tokens[0]}")
+        print("")
+
+        print("")
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print("Would you like to perform another operation? (y/n)")
         print("")
         goAgain = input(" --> ").lower()
-        if goAgain in ["no", "n", "exit", "quit"]:
-            calcOn = False
+        validChoice = False
+        while not validChoice:
+            if goAgain in ["no", "n", "exit", "quit"]:
+                calcOn = False
+                validChoice = True
+            elif goAgain in ["yes", "y"]:
+                validChoice = True
+            else:
+                print("Invalid option - choose again!")
 
-        elif goAgain in ["yes", "y"]:
-            # Do some calculating
-            print("~~~~~~~~~~~~~~~~~~~~")
-            print("")
-            print("Enter an equation (ex. '2 + 2 - 4)")
-            print("")
-            equation = input(" --> ")
-            chunks = tokenize(equation)
-
-            chunks = evaluate(chunks, "*")
-            print(chunks)
-            chunks = evaluate(chunks, "/")
-            print(chunks)
-            chunks = evaluate(chunks, "+")
-            print(chunks)
-            chunks = evaluate(chunks, "-")
-            print(chunks)
-
-
-
-
-        else:
-            print("Invalid option - choose again!")
-
-
-    # userInput = input("Type in an operation: +, - ,* /")
-    # numOne = input("Give me a number")
-    # numTwo = input("Give me another number")
-    # operations["+"] # --> add
-    # operations["+"](numOne, numTwo) # --> add(numOne, numTwo)
-    # operations[userInput](numOne, numTwo)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
