@@ -56,6 +56,8 @@ def evaluate(tokens, operator):
     newTokens = [tokens[0]]
 
     for idx in range(1, len(tokens), 2):
+    
+        # [2, +, 4, +, 5]
 
         op = tokens[idx]
         right = tokens[idx + 1]
@@ -99,9 +101,9 @@ def main():
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print("Would you like to perform another operation? (y/n)")
         print("")
-        goAgain = input(" --> ").lower()
         validChoice = False
         while not validChoice:
+            goAgain = input(" --> ").lower()
             if goAgain in ["no", "n", "exit", "quit"]:
                 calcOn = False
                 validChoice = True
