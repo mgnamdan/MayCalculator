@@ -25,12 +25,18 @@ def divide(numOne, numTwo):
 
 
 
-def tokenize(equation):
-    num = ""
+def powerOf(numOne, numTwo):
+    return str(float(numOne) ** float(numTwo))
+
+
+
+def tokenize(equation, lastResult=""):
+    num = lastResult
     tokens = []
+    subToken = []
 
     for char in equation:
-        if char in ["+", "-", "*", "/"]:
+        if char in ["+", "-", "*", "/", "^"]:
             tokens.append(num)
             tokens.append(char)
             num = ""
@@ -45,32 +51,52 @@ def tokenize(equation):
 
 
 
-def evaluate(tokens, operator):
+def evaluate(listIn):
     operations = {
-        "+": add,
-        "-": subtract,
+        "^": powerOf,
         "*": multiply,
         "/": divide,
+        "+": add,
+        "-": subtract,
     }
 
-    newTokens = [tokens[0]]
+    tokens = listIn
 
-    for idx in range(1, len(tokens), 2):
-    
-        # [2, +, 4, +, 5]
+    for operator in operations.keys():
+        newTokens = [tokens[0]]
+        for idx in range(1, len(tokens), 2):
 
-        op = tokens[idx]
-        right = tokens[idx + 1]
+            op = tokens[idx]
+            right = tokens[idx + 1]
 
-        if op == operator:
-            left = newTokens.pop()
-            result = operations[operator](left, right)
-            newTokens.append(result)
-        else:
-            newTokens.append(op)
-            newTokens.append(right)
+            if op == operator:
+                left = newTokens.pop()
+                result = operations[operator](left, right)
+                newTokens.append(result)
+            else:
+                newTokens.append(op)
+                newTokens.append(right)
+        tokens = newTokens
 
-    return newTokens
+    return newTokens[0]
+
+
+
+def loadResult():
+    try:
+        with open("calcSave.txt", "r") as file:
+            result = file.read()
+            if result == "":
+                result = None
+            return result
+    except FileNotFoundError:
+        return None
+
+
+
+def saveResult(result):
+    with open("calcSave.txt", "w") as file:
+        file.write(result)
 
 
 
@@ -79,8 +105,18 @@ def evaluate(tokens, operator):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 def main():
     calcOn = True
+    result = loadResult()
 
     while calcOn:
+        useLastResult = False
+        if result != None:
+            print("")
+            print("Use last result? (y/n)")
+            print("")
+            resultChoice = input(" --> ").lower()
+            if resultChoice in ['yes', 'y']:
+                useLastResult = True
+            
 
         print("")
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -88,13 +124,16 @@ def main():
         print("Enter an equation")
         print("")
         equation = input(" --> ")
+        if useLastResult:
+            tokens = tokenize(equation, result)
+        else:
+            tokens = tokenize(equation)
 
-        tokens = tokenize(equation)
-        for operator in ['*', '/', '+', '-']:
-            tokens = evaluate(tokens, operator)
+        result = evaluate(tokens)
+        saveResult(result)
 
         print("")
-        print(f" --> {tokens[0]}")
+        print(f" --> {result}")
         print("")
 
         print("")
